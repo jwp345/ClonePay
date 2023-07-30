@@ -1,4 +1,5 @@
-package common;
+package com.fastcampuspay.common;
+
 
 import javax.validation.*;
 import java.util.Set;
