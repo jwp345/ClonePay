@@ -2,8 +2,8 @@ plugins {
     id 'com.palantir.docker' version '0.25.0'
 }
 
-group = 'com.fastcampuspay.membership'
-version = '1.0.2'
+group = 'com.fastcampuspay.logging-consumer'
+version = '1.0.0'
 
 
 repositories {
@@ -26,7 +26,7 @@ dependencies {
     testImplementation 'junit:junit:4.13.1'
     implementation project(path: ':common')
 
-//    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'com.h2database:h2'
     runtimeOnly 'mysql:mysql-connector-java'
 }
 
