@@ -72,4 +72,34 @@ public class RequestMoneyChangingController {
         return resultDetail;
 
     }
+
+    @PostMapping(path = "/money/increase-async")
+    MoneyChangingResultDetail increaseMoneyChangingRequestAsync(@RequestBody IncreaseMoneyChangingRequest request) {
+        // request~~
+        // request -> Command
+        // Usecase
+//        RegisterBankAccountCommand command = RegisterBankAccountCommand.builder()
+//                .membershipId(request.getMembershipId())
+//                .bankAccountNumber(request.getBankAccountNumber())
+//                .bankName(request.getBankName())
+//                .isValid(request.isValid())
+//                .build();
+
+        IncreaseMoneyRequestCommand command = IncreaseMoneyRequestCommand.builder()
+                .targetMembershipId(request.getTargetMembershipId())
+                .amount(request.getAmount())
+                .build();
+
+        MoneyChangingRequest moneyChangingRequest = increaseMoneyRequestUseCase.increaseMoneyRequestAsync(command);
+        // MoneyChangingRequest -> MoneyChangingResultDetail
+        MoneyChangingResultDetail resultDetail = new MoneyChangingResultDetail(
+                moneyChangingRequest.getMoneyChangingRequestId(),
+                0,
+                0,
+                moneyChangingRequest.getChangingMoneyAmount()
+        );
+
+
+        return resultDetail;
+    }
 }
