@@ -80,6 +80,12 @@ public class RechargingMoneyResultConsumer {
                             this.countDownLatchManager.setDataForKey(task.getTaskID(), "failed");
                         }
 
+//                        try {
+//                            Thread.sleep(3000);
+//                        } catch (InterruptedException e) {
+//                            throw new RuntimeException(e);
+//                        }
+
                         this.countDownLatchManager.getCountDownLatch(task.getTaskID()).countDown();
                     }
                 }
