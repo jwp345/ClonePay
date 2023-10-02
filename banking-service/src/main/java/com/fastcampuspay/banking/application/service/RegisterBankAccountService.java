@@ -52,12 +52,17 @@ public class RegisterBankAccountService implements RegisterBankAccountUseCase {
         // 2-1. 등록가능하지않은 계좌라면. 에러를 리턴
 
         if (accountIsValid) {
-            RegisteredBankAccountJpaEntity savedAccountInfo = registerBankAccountPort.createRegisteredBankAccount(
-                    new RegisteredBankAccount.MembershipId(command.getMembershipId() +""),
-                    new RegisteredBankAccount.BankName(command.getBankName()),
-                    new RegisteredBankAccount.BankAccountNumber(command.getBankAccountNumber()),
-                    new RegisteredBankAccount.LinkedStatusIsValid(command.isValid())
-            );
+            RegisteredBankAccountJpaEntity savedAccountInfo = registerBankAccountPort.
+                    findRegisteredBankAccount(new RegisteredBankAccount.MembershipId(command.getMembershipId()));
+
+            if(savedAccountInfo == null) {
+                savedAccountInfo = registerBankAccountPort.createRegisteredBankAccount(
+                        new RegisteredBankAccount.MembershipId(command.getMembershipId()),
+                        new RegisteredBankAccount.BankName(command.getBankName()),
+                        new RegisteredBankAccount.BankAccountNumber(command.getBankAccountNumber()),
+                        new RegisteredBankAccount.LinkedStatusIsValid(command.isValid())
+                );
+            }
 
             return mapper.mapToDomainEntity(savedAccountInfo);
         } else {

@@ -1,19 +1,13 @@
 package com.fastcampuspay.banking.application.service;
 
-import com.fastcampuspay.banking.adapter.out.external.bank.BankAccount;
 import com.fastcampuspay.banking.adapter.out.external.bank.ExternalFirmbankingRequest;
 import com.fastcampuspay.banking.adapter.out.external.bank.FirmbankingResult;
-import com.fastcampuspay.banking.adapter.out.external.bank.GetBankAccountRequest;
 import com.fastcampuspay.banking.adapter.out.persistence.FirmbankingRequestJpaEntity;
 import com.fastcampuspay.banking.adapter.out.persistence.FirmbankingRequestMapper;
 import com.fastcampuspay.banking.adapter.out.persistence.RegisteredBankAccountJpaEntity;
-import com.fastcampuspay.banking.adapter.out.persistence.RegisteredBankAccountMapper;
-import com.fastcampuspay.banking.application.port.in.RegisterBankAccountCommand;
-import com.fastcampuspay.banking.application.port.in.RegisterBankAccountUseCase;
 import com.fastcampuspay.banking.application.port.in.RequestFirmbankingCommand;
 import com.fastcampuspay.banking.application.port.in.RequestFirmbankingUseCase;
 import com.fastcampuspay.banking.application.port.out.RegisterBankAccountPort;
-import com.fastcampuspay.banking.application.port.out.RequestBankAccountInfoPort;
 import com.fastcampuspay.banking.application.port.out.RequestExternalFirmbankingPort;
 import com.fastcampuspay.banking.application.port.out.RequestFirmbankingPort;
 import com.fastcampuspay.banking.domain.FirmBankingRequest;
@@ -34,6 +28,8 @@ public class RequestFirmbankingService implements RequestFirmbankingUseCase {
     private final RequestFirmbankingPort requestFirmbankingPort;
 
     private final RequestExternalFirmbankingPort requestExternalFirmbankingPort;
+    private final RegisterBankAccountPort registerBankAccountPort;
+
     @Override
     public FirmBankingRequest requestFirmbanking(RequestFirmbankingCommand command) {
 
@@ -41,9 +37,11 @@ public class RequestFirmbankingService implements RequestFirmbankingUseCase {
         // a -> b 계좌
 
         // 1. 요청에 대해 정보를 먼저 write . "요청" 상태로
+        RegisteredBankAccountJpaEntity accountJpaEntity = registerBankAccountPort.findRegisteredBankAccount(
+                new RegisteredBankAccount.MembershipId(command.fromMembershipId));
         FirmbankingRequestJpaEntity requestedJpaEntity = requestFirmbankingPort.createFirmbankingRequest(
-                new FirmBankingRequest.FromBankName(command.getFromBankName()),
-                new FirmBankingRequest.FromBankAccountNumber(command.getFromBankAccountNumber()),
+                new FirmBankingRequest.FromBankName(accountJpaEntity.getBankName()),
+                new FirmBankingRequest.FromBankAccountNumber(accountJpaEntity.getBankAccountNumber()),
                 new FirmBankingRequest.ToBankName(command.getToBankName()),
                 new FirmBankingRequest.ToBankAccountNumber(command.getToBankAccountNumber()),
                 new FirmBankingRequest.MoneyAmount(command.getMoneyAmount()),
@@ -52,8 +50,8 @@ public class RequestFirmbankingService implements RequestFirmbankingUseCase {
 
         // 2. 외부 은행에 펌뱅킹 요청
         FirmbankingResult result = requestExternalFirmbankingPort.requestExternalFirmbanking(new ExternalFirmbankingRequest(
-                command.getFromBankName(),
-                command.getFromBankAccountNumber(),
+                accountJpaEntity.getBankName(),
+                accountJpaEntity.getBankAccountNumber(),
                 command.getToBankName(),
                 command.getToBankAccountNumber()
         ));
@@ -64,7 +62,6 @@ public class RequestFirmbankingService implements RequestFirmbankingUseCase {
 
         // 3. 결과에 따라서 1번에서 작성했던 FirmbankingRequest 정보를 update
         if(result.getResultCode() == 0) {
-
             requestedJpaEntity.setFirmbankingStatus(1);
         } else {
             requestedJpaEntity.setFirmbankingStatus(2);

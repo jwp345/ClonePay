@@ -14,10 +14,7 @@ import javax.validation.constraints.NotNull;
 public class RequestFirmbankingCommand extends SelfValidating<RequestFirmbankingCommand> {
 
     @NotNull
-    public final String fromBankName;
-
-    @NotNull
-    private final String fromBankAccountNumber;
+    public final String fromMembershipId;
 
     @NotNull
     private final String toBankName;
@@ -29,9 +26,8 @@ public class RequestFirmbankingCommand extends SelfValidating<RequestFirmbanking
     private final int moneyAmount;
 
 
-    public RequestFirmbankingCommand(String fromBankName, String fromBankAccountNumber, String toBankName, String toBankAccountNumber, int moneyAmount) {
-        this.fromBankName = fromBankName;
-        this.fromBankAccountNumber = fromBankAccountNumber;
+    public RequestFirmbankingCommand(String fromMembershipId, String toBankName, String toBankAccountNumber, int moneyAmount) {
+        this.fromMembershipId = fromMembershipId;
         this.toBankName = toBankName;
         this.toBankAccountNumber = toBankAccountNumber;
         this.moneyAmount = moneyAmount;

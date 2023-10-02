@@ -1,13 +1,14 @@
-package com.fastcampuspay.remittance.application.port.out.banking;
+package com.fastcampuspay.remittance.adapter.out.service.banking;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class BankingInfo {
+@NoArgsConstructor
+@Data
+public class Banking {
+    private String membershipId;
     private String bankName;
     private String bankAccountNumber;
     private boolean isValid;

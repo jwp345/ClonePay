@@ -22,4 +22,9 @@ public class RegisteredBankAccountPersistenceAdapter implements RegisterBankAcco
                 )
         );
     }
+
+    @Override
+    public RegisteredBankAccountJpaEntity findRegisteredBankAccount(RegisteredBankAccount.MembershipId membershipId) {
+        return bankAccountRepository.findByMembershipId(membershipId.getMembershipId());
+    }
 }

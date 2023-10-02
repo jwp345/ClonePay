@@ -17,7 +17,7 @@ public class RemittanceRequestPersistenceAdapter implements RequestRemittancePor
 
     @Override
     public RemittanceRequestJpaEntity createRemittanceRequestHistory(RequestRemittanceCommand command) {
-        remittanceRequestRepository.save(RemittanceRequestJpaEntity.builder()
+        return remittanceRequestRepository.save(RemittanceRequestJpaEntity.builder()
                 .fromMembershipId(command.getFromMembershipId())
                 .toMembershipId(command.getToMembershipId())
                 .toBankName(command.getToBankName())
@@ -25,7 +25,6 @@ public class RemittanceRequestPersistenceAdapter implements RequestRemittancePor
                 .amount(command.getAmount())
                 .remittanceType(command.getRemittanceType())
                 .build());
-        return null;
     }
 
     @Override
@@ -37,6 +36,6 @@ public class RemittanceRequestPersistenceAdapter implements RequestRemittancePor
     @Override
     public List<RemittanceRequestJpaEntity> findRemittanceHistory(FindRemittanceCommand command) {
         // using JPA
-        return null;
+        return remittanceRequestRepository.findAllByFromMembershipId(command.getMembershipId());
     }
 }

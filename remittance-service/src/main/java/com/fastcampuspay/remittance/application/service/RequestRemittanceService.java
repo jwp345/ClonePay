@@ -6,6 +6,7 @@ import com.fastcampuspay.remittance.adapter.out.persistence.RemittanceRequestMap
 import com.fastcampuspay.remittance.application.port.in.RequestRemittanceCommand;
 import com.fastcampuspay.remittance.application.port.in.RequestRemittanceUseCase;
 import com.fastcampuspay.remittance.application.port.out.RequestRemittancePort;
+import com.fastcampuspay.remittance.application.port.out.banking.BankingInfo;
 import com.fastcampuspay.remittance.application.port.out.banking.BankingPort;
 import com.fastcampuspay.remittance.application.port.out.membership.MembershipPort;
 import com.fastcampuspay.remittance.application.port.out.membership.MembershipStatus;
@@ -27,7 +28,6 @@ public class RequestRemittanceService implements RequestRemittanceUseCase {
     private final MoneyPort moneyPort;
     private final BankingPort bankingPort;
 
-
     @Override
     public RemittanceRequest requestRemittance(RequestRemittanceCommand command) {
 
@@ -45,7 +45,7 @@ public class RequestRemittanceService implements RequestRemittanceUseCase {
         // 잔액이 충분치 않은 경우 -> 충전이 필요한 경우
         if(moneyInfo.getBalance() < command.getAmount()) {
             // 만원 단위로 올림하는 Math 함수
-            int rechargeAmount = (int) Math.ceil((command.getAmount() - moneyInfo.getBalance() / 10000.0) * 10000);
+            int rechargeAmount = (int) Math.ceil((command.getAmount() - moneyInfo.getBalance()) / 10000.0) * 10000;
 
             // 2-1. 잔액이 충분하지 않다면, 충전 요청 (money svc)
             boolean moneyResult = moneyPort.requestMoneyRecharging(command.getFromMembershipId(), rechargeAmount);
@@ -69,8 +69,13 @@ public class RequestRemittanceService implements RequestRemittanceUseCase {
         } else if(command.getRemittanceType() == 1) {
             // 3-2. 외부 은행 계좌
             // 외부 은행 계좌가 적절한지 확인 (banking svc)
-            // 법인계좌 -> 외부 은행 계좌 펌뱅킹 요청 (banking svc)=
-            boolean remittanceResult = bankingPort.requestFirmBanking(command.getToBankName(), command.getToBankAccountNumber(), command.getAmount());
+            // 법인계좌 -> 외부 은행 계좌 펌뱅킹 요청 (banking svc)
+            BankingInfo bankingInfo = bankingPort.getMembershipBankingInfo(command.getToBankName(), command.getToBankAccountNumber(), command.getToMembershipId());
+            if(!bankingInfo.isValid()) {
+                return null;
+            }
+
+            boolean remittanceResult = bankingPort.requestFirmBanking(command.getToBankName(), command.getToBankAccountNumber(), command.getFromMembershipId(), command.getAmount());
             if(!remittanceResult) {
                 return null;
             }

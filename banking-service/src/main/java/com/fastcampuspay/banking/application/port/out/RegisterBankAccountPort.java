@@ -11,4 +11,6 @@ public interface RegisterBankAccountPort {
             RegisteredBankAccount.BankAccountNumber bankAccountNumber,
             RegisteredBankAccount.LinkedStatusIsValid linkedStatusIsValid
     );
+
+    RegisteredBankAccountJpaEntity findRegisteredBankAccount(RegisteredBankAccount.MembershipId membershipId);
 }

@@ -26,7 +26,7 @@ public class RequestRemittanceCommand extends SelfValidating<RequestRemittanceCo
 
     // 송금요청 금액
     @NotNull
-    @NotBlank
+//    @NotBlank
     private int amount;
 
     public RequestRemittanceCommand(String fromMembershipId, String toMembershipId, String toBankName, String toBankAccountNumber, int remittanceType, int amount) {
